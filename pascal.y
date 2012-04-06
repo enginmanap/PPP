@@ -1,9 +1,9 @@
 %{
   #include <stdio.h>
   #include "custom.h"
-  char* defined = "DEBUGFILE";
   int yylex(void);
   void yyerror(char *);
+  char* defined;
 %}
 
 %union{
@@ -60,8 +60,14 @@ void yyerror(char *s) {
 	fprintf(stderr, "%s\n", s);
 }
 
-int main(void) {
+int main(int argc, char *argv[] ) {
+    if ( argc != 2 ) { /* argc should be 2 for correct execution */
+        /* We print argv[0] assuming it is the program name */
+        printf( "usage: %s defined_name\n", argv[0] );
+    } else {
+	defined = argv[1];
 	yyparse();
 	return 0;
+    }
 }
 
