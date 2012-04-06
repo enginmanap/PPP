@@ -1,6 +1,7 @@
 %{
   #include <stdio.h>
   #include "custom.h"
+  char* defined = "DEBUGFILE";
   int yylex(void);
   void yyerror(char *);
 %}
@@ -30,17 +31,17 @@ program:
 
 
 ifdef_block:
-	IFDEF code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF ' ' RIGHT_CURLY_BRACKED	{ $$ = ""; }
-	| IFDEF code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED	{ $$ = ""; }
+	IFDEF ' ' code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF ' ' RIGHT_CURLY_BRACKED	{ if(strcmp($3, defined) == 0)$$ = $5; else $$ = ""; }
+	| IFDEF ' ' code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($3, defined) == 0)$$ = $5; else $$ = ""; }
 
 ifndef_block:
-	IFNDEF code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF ' ' RIGHT_CURLY_BRACKED	{ $$ = ""; }
-	| IFNDEF code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED	{ $$ = ""; }
+	IFNDEF ' ' code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF ' ' RIGHT_CURLY_BRACKED	{ if(strcmp($3, defined) == 0)$$ = ""; else $$ = $5; }
+	| IFNDEF ' ' code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($3, defined) == 0)$$ = ""; else $$ = $5; }
 
 preprocessor_block:
-	 ifdef_block							{ $$ = ""; } 
-	| ifndef_block							{ $$ = ""; } 
-	| code								{ $$ = strconcat("", $1); }
+	 ifdef_block							{ $$ = $1; } 
+	| ifndef_block							{ $$ = $1; } 
+	| code								{ $$ = strconcat("{$", $1); }
 
 code:
 	LEFT_CURLY_BRACKED DOLLAR_SIGN preprocessor_block		{ $$ = $3; }
