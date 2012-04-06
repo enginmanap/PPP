@@ -16,4 +16,4 @@ else
     ./ppp < $1 > $2
 fi
 
-echo "Conversation successful"
+echo "Processing finished."
