@@ -11,9 +11,9 @@ fi
 
 if [ $# -eq 1 ]
 then
-    ./pas2c < $1 > output.c
+    ./ppp < $1 > output.pas
 else
-    ./pas2c < $1 > $2
+    ./ppp < $1 > $2
 fi
 
 echo "Conversation successful"

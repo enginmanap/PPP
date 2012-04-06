@@ -13,14 +13,16 @@ anything	[^ \n{}$]+
 
 "{"		{ return LEFT_CURLY_BRACKED; }
 "}"		{ return RIGHT_CURLY_BRACKED; }
+
 "$"		{ return DOLLAR_SIGN; }
+"IFNDEF"	{ return IFNDEF; }
 "IFDEF"		{ return IFDEF; }
 "ENDIF"		{ return ENDIF; }
 
 [ \n]            return *yytext;
 
 {anything}	{ yylval.str = strdup(yytext);
-		return RAW; }
+		  return RAW; }
 %%
 
 int yywrap(void) {
