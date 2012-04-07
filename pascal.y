@@ -22,7 +22,7 @@
 %token <str>RAW 
 %token <str> VARIABLE
 
-%type <str> program ifdef_block code_block code preprocessor_block ifndef_block space white_space
+%type <str> program ifdef_block ifdef_starter code_block code preprocessor_block ifndef_block space white_space ifndef_starter
 
 %%
  
@@ -30,18 +30,23 @@ program:
 	code_block							{ printf("%s", $1); }
 	;
 
+ifdef_starter:
+	IFDEF white_space code_block RIGHT_CURLY_BRACKED		{if(strcmp($3, defined) == 0) $$ = "true"; else $$ == "false"; }
+
+ifndef_starter:
+	IFNDEF white_space code_block RIGHT_CURLY_BRACKED		{if(strcmp($3, defined) == 0) $$ = "true"; else $$ == "false"; }
 
 ifdef_block:
-	IFDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($3, defined) == 0)$$ = $5; else $$ = ""; }
-	| IFDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($3, defined) == 0)$$ = $5; else $$ = ""; }
-	| IFDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($3, defined) == 0)$$ = $5; else $$ = $10; }
-	| IFDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($3, defined) == 0)$$ = $5; else $$ = $10; }
+	ifdef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = ""; }
+	| ifdef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = ""; }
+	| ifdef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = $7; }
+	| ifdef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = $7; }
 
 ifndef_block:
-	IFNDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($3, defined) == 0)$$ = ""; else $$ = $5; }
-	| IFNDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($3, defined) == 0)$$ = ""; else $$ = $5; }
-	| IFNDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($3, defined) == 0)$$ = $10; else $$ = $5; }
-	| IFNDEF white_space code_block RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($3, defined) == 0)$$ = $10; else $$ = $5; }
+	ifndef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($1, "true") == 0)$$ = ""; else $$ = $2; }
+	| ifndef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($1, "true") == 0)$$ = ""; else $$ = $2; }
+	| ifndef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF white_space RIGHT_CURLY_BRACKED	{ if(strcmp($1, "true") == 0)$$ = $7; else $$ = $2; }
+	| ifndef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED		{ if(strcmp($1, "true") == 0)$$ = $7; else $$ = $2; }
 
 preprocessor_block:
 	 ifdef_block							{ $$ = $1; } 
