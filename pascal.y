@@ -22,7 +22,7 @@
 %token <str>RAW 
 %token <str> VARIABLE
 
-%type <str> program ifdef_block ifdef_starter code_block code preprocessor_block ifndef_block space white_space ifndef_starter ifdef_block_end
+%type <str> program ifdef_block ifdef_starter code_block code preprocessor_block ifndef_block space white_space ifndef_starter ifdef_block_end ifdef_else
 
 %%
  
@@ -39,13 +39,16 @@ ifndef_starter:
 ifdef_block_end:
 	LEFT_CURLY_BRACKED DOLLAR_SIGN ENDIF RIGHT_CURLY_BRACKED	{ $$ = ""; }
 
+ifdef_else:
+	LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED	{ $$ = ""; }
+
 ifdef_block:
-	ifdef_starter code_block ifdef_block_end	{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = ""; }
-	| ifdef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block ifdef_block_end	{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = $7; }
+	ifdef_starter code_block ifdef_block_end				{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = ""; }
+	| ifdef_starter code_block ifdef_else code_block ifdef_block_end	{ if(strcmp($1, "true") == 0)$$ = $2; else $$ = $4; }
 
 ifndef_block:
-	ifndef_starter code_block ifdef_block_end	{ if(strcmp($1, "true") == 0)$$ = ""; else $$ = $2; }
-	| ifndef_starter code_block LEFT_CURLY_BRACKED DOLLAR_SIGN ELSEDEF RIGHT_CURLY_BRACKED code_block ifdef_block_end	{ if(strcmp($1, "true") == 0)$$ = $7; else $$ = $2; }
+	ifndef_starter code_block ifdef_block_end				{ if(strcmp($1, "true") == 0)$$ = ""; else $$ = $2; }
+	| ifndef_starter code_block ifdef_else code_block ifdef_block_end	{ if(strcmp($1, "true") == 0)$$ = $4; else $$ = $2; }
 
 preprocessor_block:
 	 ifdef_block							{ $$ = $1; } 
