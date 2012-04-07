@@ -17,6 +17,7 @@ anything	[^ \n{}$]+
 "$"		{ return DOLLAR_SIGN; }
 "IFNDEF"	{ return IFNDEF; }
 "IFDEF"		{ return IFDEF; }
+"ELSE"		{ return ELSEDEF; }
 "ENDIF"		{ return ENDIF; }
 
 [ \n]            return *yytext;
