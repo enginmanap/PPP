@@ -8,7 +8,7 @@ How To Use:
 
 first run the build script. Then use the converter as this:
 
-sh preprocess.sh input_file output_file
+sh preprocess.sh defined_name input_file output_file
 
 if no output file given, it creates a file named output.pas
 
